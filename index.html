@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrie Revolutionen Simulation</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f7fa;
+      padding: 30px;
+      margin: 0;
+      color: #333;
+    }
+
+    .revolution-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      width: 80%;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .revolution-header {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .revolution-period {
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      color: #555;
+    }
+
+    .revolution-details {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .key-info {
+      margin-bottom: 12px;
+      font-size: 1.1em;
+    }
+
+    .key-info strong {
+      color: #007bff;
+    }
+
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      background-color: #007bff;
+      color: white;
+      font-size: 1.1em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, opacity 0.3s ease;
+      flex: 1;
+      margin: 0 10px;
+    }
+
+    .btn:disabled {
+      background-color: #b8c1d1;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: #0056b3;
+    }
+
+    .btn:active:not(:disabled) {
+      background-color: #004085;
+    }
+
+    @media (max-width: 600px) {
+      .revolution-container {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="revolution-container">
+    <div id="revolution-header" class="revolution-header">Industrie Revolution 1.0</div>
+    <div id="revolution-period" class="revolution-period">1760 - 1840</div>
+    <div id="revolution-details" class="revolution-details">
+      <div class="key-info"><strong>Wichtige Innovationen:</strong> Dampfmaschine</div>
+      <div class="key-info"><strong>Schlüsselpersonen:</strong> James Watt, Richard Arkwright, Samuel Crompton</div>
+      <div class="key-info"><strong>Auswirkungen:</strong> Urbanisierung, Wachstum von Fabriken und Eisenbahnen</div>
+      <div class="key-info"><strong>Betroffene Industrien:</strong> Textilindustrie, Bergbau, Transportwesen</div>
+      <div class="key-info"><strong>Technologie:</strong> Mechanisierung durch Wasser- und Dampfkraft</div>
+      <div class="key-info"><strong>Story:</strong> Eine kleine Weberei in England wird durch die Einführung der Dampfmaschine revolutioniert. Anstatt langsamer Handarbeit treiben dampfbetriebene Maschinen die Produktion an und das Dorf verwandelt sich in ein Zentrum der neuen „industriellen Revolution“.</div>
+    </div>
+    <div class="btn-container">
+      <button class="btn" id="btn-vor" onclick="simulation.vorwardRevolution()">Vorherige Revolution</button>
+      <button class="btn" id="btn-next" onclick="simulation.nextRevolution()">Nächste Revolution</button>
+    </div>
+  </div>
+
+  <script>
+    class Revolution {
+      constructor(name, period, key_innovations, key_figures, impacts, industries_affected, technology, story) {
+        this.name = name;
+        this.period = period;
+        this.key_innovations = key_innovations;
+        this.key_figures = key_figures;
+        this.impacts = impacts;
+        this.industries_affected = industries_affected;
+        this.technology = technology;
+        this.story = story;
+      }
+
+      getDetails() {
+        return `
+          <div class="key-info"><strong>Wichtige Innovationen:</strong> ${this.key_innovations.join(', ')}</div>
+          <div class="key-info"><strong>Schlüsselpersonen:</strong> ${this.key_figures.join(', ')}</div>
+          <div class="key-info"><strong>Auswirkungen:</strong> ${this.impacts.join(', ')}</div>
+          <div class="key-info"><strong>Betroffene Industrien:</strong> ${this.industries_affected.join(', ')}</div>
+          <div class="key-info"><strong>Technologie:</strong> ${this.technology}</div>
+          <div class="key-info"><strong>Story:</strong> ${this.story}</div>
+        `;
+      }
+    }
+
+    class RevolutionSimulation {
+      constructor(revolutions) {
+        this.revolutions = revolutions;
+        this.currentRevolutionIndex = 0;
+        this.updateRevolutionInfo();
+        this.updateButtonState();
+      }
+
+      updateRevolutionInfo() {
+        const revolution = this.revolutions[this.currentRevolutionIndex];
+        document.getElementById("revolution-header").innerText = revolution.name;
+        document.getElementById("revolution-period").innerText = revolution.period;
+        document.getElementById("revolution-details").innerHTML = revolution.getDetails();
+      }
+
+      updateButtonState() {
+        const btnPrev = document.getElementById("btn-vor");
+        const btnNext = document.getElementById("btn-next");
+
+        if (this.currentRevolutionIndex === 0) {
+          btnPrev.disabled = true;
+        } else {
+          btnPrev.disabled = false;
+        }
+
+        if (this.currentRevolutionIndex === this.revolutions.length - 1) {
+          btnNext.disabled = true;
+        } else {
+          btnNext.disabled = false;
+        }
+      }
+
+      nextRevolution() {
+        if (this.currentRevolutionIndex < this.revolutions.length - 1) {
+          this.currentRevolutionIndex++;
+          this.updateRevolutionInfo();
+          this.updateButtonState();
+        }
+      }
+
+      vorwardRevolution() {
+        if (this.currentRevolutionIndex > 0) {
+          this.currentRevolutionIndex--;
+          this.updateRevolutionInfo();
+          this.updateButtonState();
+        }
+      }
+    }
+
+    const revolutions = [
+      new Revolution(
+        "Industrie Revolution 1.0",
+        "1760 - 1840",
+        ["Dampfmaschine"],
+        ["James Watt", "Richard Arkwright", "Samuel Crompton"],
+        ["Urbanisierung", "Wachstum von Fabriken und Eisenbahnen"],
+        ["Textilindustrie", "Bergbau", "Transportwesen"],
+        "Mechanisierung durch Wasser- und Dampfkraft",
+        "Eine kleine Weberei in England wird durch die Einführung der Dampfmaschine revolutioniert. Anstatt langsamer Handarbeit treiben dampfbetriebene Maschinen die Produktion an und das Dorf verwandelt sich in ein Zentrum der neuen „industriellen Revolution“."
+      ),
+      new Revolution(
+        "Industrie Revolution 2.0",
+        "1870 - 1914",
+        ["Elektrizität", "Fließbandproduktion (z. B. bei Ford)"],
+        ["Henry Ford", "Nikola Tesla", "Thomas Edison"],
+        ["Veränderung der Arbeitswelt durch Fließbandproduktion", "Verbreitung von Elektrizität"],
+        ["Automobilindustrie", "Elektronik", "Eisenbahn"],
+        "Elektrizität und Massenproduktion durch Fließbänder",
+        "In einer Autohalle in Detroit setzt Henry Ford erstmals Fließbänder ein, wodurch Autos wie das Modell T schneller und kostengünstiger hergestellt werden können. Massenproduktion wird zum Standard, und die Konsumgesellschaft erlebt ihren Aufschwung."
+      ),
+      new Revolution(
+        "Industrie Revolution 3.0",
+        "1970 - 2000",
+        ["Automatisierte Produktionsanlagen", "speicherprogrammierbare Steuerungen (SPS)"],
+        ["Steve Jobs", "Bill Gates", "Alan Turing"],
+        ["Automatisierung", "IT-Integration"],
+        ["IT-Industrie", "Automobilindustrie", "Elektroindustrie"],
+        "Elektronik, IT und Automatisierung",
+        "In einer deutschen Autofabrik installiert ein Techniker erstmals einen Industrieroboter, der schwere Schweißarbeiten übernimmt. Mit Computern und Robotern wird die Produktion schneller, sicherer und flexibler. Die Automatisierung nimmt Fahrt auf."
+      ),
+      new Revolution(
+        "Industrie Revolution 4.0",
+        "ab 2010",
+        ["Cyber-physische Systeme", "Predictive Maintenance", "Machine Learning"],
+        ["Elon Musk", "Mark Zuckerberg", "Jeff Bezos"],
+        ["Big Data", "Internet der Dinge (IoT)", "Automatisierung"],
+        ["IT und digitale Industrien", "Automobilindustrie", "Elektronikindustrie"],
+        "Digitalisierung, Vernetzung und intelligente Systeme (IoT, KI, Big Data)",
+        "In einer modernen Smart Factory in München arbeitet Ingenieurin Anna mit einem digitalen Dashboard, das Maschinen überwacht und potenzielle Ausfälle meldet. Die Produktion ist flexibel und hochautomatisiert – Industrie 4.0 ermöglicht eine schnelle Anpassung an Kundenbedürfnisse und Produktionsänderungen."
+      ),
+      new Revolution(
+        "Industrie Revolution 5.0",
+        "ab 2020",
+        ["Cobots", "Smart Wearables", "grüne Produktionssysteme"],
+        ["Lea", "Anna"],
+        ["Menschzentrierte Produktion", "Nachhaltigkeit"],
+        ["Automobilindustrie", "Medizintechnik", "Hightech-Produktion"],
+        "Mensch-Maschine-Kollaboration, nachhaltige Technologien",
+        "In einer menschenzentrierten Fabrik arbeitet Lea Hand in Hand mit einem Cobot namens Buddy. Sie erledigen schwere Aufgaben gemeinsam, während Sensoren für eine angenehme Arbeitsumgebung sorgen. Dank KI-gestützter Systeme werden Lieferketten in Echtzeit angepasst und Ressourcen optimiert – die Zukunft ist nachhaltig und auf den Menschen ausgerichtet."
+      ),
+      new Revolution(
+        "Industrie Revolution 6.0",
+        "ab ca. 2040",
+        ["Neuronale Schnittstellen", "Quantencomputer", "selbstheilende Materialien"],
+        ["Max", "Sophia"],
+        ["Vollständig autonome Systeme", "Ethik und Nachhaltigkeit"],
+        ["Produktionstechnologien", "Künstliche Intelligenz"],
+        "Vollständig autonome Systeme, Quantencomputing, neuronale Schnittstellen",
+        "Max, ein Produktionsleiter, steuert eine nachhaltige Fabrik direkt über eine neuronale Schnittstelle. Durch seine Verbindung zur Produktions-KI kann er ethische und ressourcenschonende Entscheidungen treffen. Maschinen aus selbstheilendem Material reparieren sich selbst und reagieren autonom auf Veränderungen – Industrie 6.0 führt zu einer harmonischen Einheit von Mensch, Natur und Technologie."
+      )
+    ];
+
+    const simulation = new RevolutionSimulation(revolutions);
+
+  </script>
+
+</body>
+</html>
